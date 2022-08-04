@@ -1,0 +1,101 @@
+
+<html>
+	<head>
+		<script>
+			var api_key = "ZiWvaBkvD0BNtOACTwJelb1CDZXJGWyE";
+		</script>
+	</head>
+	<body>
+	<!--
+		<img src = "http://media2.giphy.com/media/FiGiRei2ICzzG/giphy.gif">
+
+		<iframe width="420" height="315"
+			src="https:\/\/giphy.com\/embed\/pjnfNhaFmkhxu">
+		</iframe>
+	-->
+	<div id = "giphs_container">
+
+
+	</div>
+
+
+		<script>
+			var search_results = [];
+			var giphs_container = document.getElementById("giphs_container");
+			var giph_src_regex = /original":{("url":".*?")/g;
+			var giph_src_array = []
+			function cleanurl (url)
+			{
+				var backslash_index = url.indexOf('\\');
+			      while (backslash_index > -1) {
+			      	url = url.slice(0,url.indexOf('\\')) + url.slice(url.indexOf('\\')+1);
+			      	backslash_index = url.indexOf('\\');
+			      }
+			    return url;
+			}
+
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", "http://api.giphy.com/v1/gifs/search?q=kitten&api_key=" + api_key+ "&limit=5", true);
+			xhr.onload = function (e) {
+			  if (xhr.readyState === 4) {
+			    if (xhr.status === 200) {
+
+	/*
+	!
+	!
+	!
+	!
+	COLLECT AND FORMAT IMAGES & METADATA
+	!
+	!
+	!
+	!
+	*/
+
+			    	/* GATHER SEARCH RESULTS AND CREATE ARRAY OF ORIGINAL GIPH URLS */
+			      search_results.push(xhr.responseText);
+			      giph_src_array.push.apply(giph_src_array, search_results[0].match(giph_src_regex));
+
+			        /* CLEAN ARRAY SO EACH ELEMENT IS FORMATTED: "https://.... ... ... .giph" */
+			      temp_array = [];
+			      giph_src_array.forEach(function(element) {
+			      	temp_array.push(cleanurl(element.substr(17)));
+			      	console.log(element);
+			      });
+			      giph_src_array = temp_array;
+
+	/*
+	!
+	!
+	!
+	POST GIPHS
+	!
+	!
+	!
+	*/
+
+			        /* POST GIPHS IN SUITABLE FASHION */
+			      giph_src_array.forEach(function(element){
+					  giphs_container.innerHTML = giphs_container.innerHTML + '<img src=' + element + '>';
+					});
+
+
+			    } else {
+			      console.error(xhr.statusText);
+			    }
+			  }
+			};
+			xhr.onerror = function (e) {
+			  console.error(xhr.statusText);
+			};
+			xhr.send(null);
+
+			
+
+			/*
+			Regex for finding original giph
+			(/original":{("url":".*?"),"width":"([0-9]*)","height":"([0-9]*)","size":"([0-9]*)/g)
+			*/
+		</script>
+	</body>
+</html>
